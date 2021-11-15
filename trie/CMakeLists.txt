@@ -1,0 +1,1 @@
+add_executable(trie trie.hpp main.cc)
