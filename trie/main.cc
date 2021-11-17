@@ -1,8 +1,9 @@
 #include "trie.hpp"
-#include <exception>
 #include <iostream>
+#include <string_view>
+#include <memory>
 
-int total_words(TrieNode *root_node) {
+[[maybe_unused]] auto total_words(TrieNode *root_node) {
   if (root_node == nullptr) {
     return 0;
   }
@@ -23,35 +24,40 @@ int total_words(TrieNode *root_node) {
   return word_count;
 }
 
-
-void print_all(std::vector<std::string> const &words) {
+[[maybe_unused]] auto print_all(std::vector<std::string> const &words) {
   for (const auto &word : words) {
     std::cout << word << "\n";
   }
 }
 
 int main() {
-  Trie *trie = new Trie();
+  auto trie = std::make_unique<Trie>();
 
   trie->construct_trie(std::vector<std::string>{
       "the", "a", "there", "answer", "any", "by", "bye", "their", "abc"});
-//  std::cout << "=========find_all_words=========\n";
-//  print_all(find_all_words(trie->get_root_node()));
-//
-//  std::cout << "=========total_words=========\n";
-//  std::cout << total_words(trie->get_root_node()) << "\n";
-//  std::cout << trie->search_node("the") << "\n";
-  for(const auto &word : trie->search_by_prefix("te")) {
-    std::cout << word << ",";
+
+  std::cout << "\n======================================\n";
+  std::string_view prefix = "thei";
+  std::string extracted_prefix;
+  std::vector<std::vector<std::string>> result{};
+
+  for (const auto &ch : prefix) {
+    extracted_prefix += ch;
+    if (extracted_prefix.size() > 1) {
+      // this means we already have atleast 2 letter prefix.
+      // search by keyword
+      std::cout << "searching for: " << extracted_prefix << "\n";
+      result.push_back(trie->search_by_prefix(extracted_prefix));
+    }
   }
 
-  for(const auto &word : trie->search_by_prefix("an")) {
-    std::cout << word << ",";
+  for (const auto &v : result) {
+    std::cout << "{\n";
+    for (const auto &n : v) {
+      std::cout << "\t\t" <<n << ",\n";
+    }
+    std::cout << "}\n\n";
   }
-  // std::cout << trie->search_node("the") << "\n";
-  // std::cout << trie->search_node("th") << "\n";
 
-  // std::cout << trie->delete_node("the") << "\n";
-  // std::cout << trie->search_node("the") << "\n";
   return 0;
 }

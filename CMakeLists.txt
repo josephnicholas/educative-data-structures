@@ -6,6 +6,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # from Jason Turner's CMake starter template
 include(cmake/CompilerWarnings.cmake)
+include(cmake/Conan.cmake)
+
+# download external dependencies
+run_conan()
+
+# link dependency
+find_package(Catch2 REQUIRED)
 
 add_subdirectory(linkedlist)
 add_subdirectory(graph)
@@ -15,3 +22,4 @@ add_subdirectory(stack)
 add_subdirectory(queue)
 add_subdirectory(heap)
 add_subdirectory(hash_table)
+add_subdirectory(test)
