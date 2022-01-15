@@ -20,16 +20,37 @@ class Graph final {
       : array_of_linked_list{std::vector<LinkedList>(vertices)},
         total_number_of_vertices{vertices} {}
 
-  void add_edge(int source, int destination) {
+  [[maybe_unused]] inline void add_edge_directed(int source, int destination) {
     if (source < total_number_of_vertices &&
         destination < total_number_of_vertices) {
       array_of_linked_list[source].insert_at_head(destination);
-      // for undirected graphs we will have
-      //      array_of_linked_list[destination].insert_at_head(source);
     }
   }
 
-  void print_graph() const {
+  [[maybe_unused]] inline void add_edge_undirected(int source,
+                                                   int destination) {
+    if (source < total_number_of_vertices &&
+        destination < total_number_of_vertices) {
+      array_of_linked_list[source].insert_at_head(destination);
+      array_of_linked_list[destination].insert_at_head(source);
+    }
+  }
+
+  [[maybe_unused]] [[nodiscard]] inline auto get_adjacency_list()
+      const noexcept {
+    return array_of_linked_list;
+  }
+
+  [[maybe_unused]] [[nodiscard]] inline auto get_total_number_of_vertices()
+      const noexcept {
+    return total_number_of_vertices;
+  }
+
+  [[nodiscard]] inline bool print_graph() const noexcept {
+    if (this->total_number_of_vertices == 0) {
+      return false;
+    }
+
     std::cout << "Adjacency List of Directed graph\n";
     Node *temp_node;
 
@@ -43,5 +64,7 @@ class Graph final {
       }
       std::cout << "NULL\n";
     }
+
+    return true;
   }
 };

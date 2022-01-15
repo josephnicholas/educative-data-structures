@@ -13,6 +13,7 @@ run_conan()
 
 # link dependency
 find_package(Catch2 REQUIRED)
+find_package(GTest REQUIRED)
 
 add_subdirectory(linkedlist)
 add_subdirectory(graph)
