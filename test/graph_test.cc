@@ -5,14 +5,14 @@ using namespace ::testing;
 
 struct GraphTestShould : Test {
   void SetUp() override {
-    graph_ = std::make_unique<Graph>(5);
+    graph_ = std::make_unique<Graph<int>>(5);
   }
 
   void TearDown() override {
     graph_.reset();
   }
 
-  std::unique_ptr<Graph> graph_{};
+  std::unique_ptr<Graph<int>> graph_{};
 };
 
 TEST_F(GraphTestShould, BePrintable) {

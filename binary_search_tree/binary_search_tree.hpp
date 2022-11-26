@@ -1,76 +1,159 @@
 #include <iostream>
+#include <memory>
 #include <string>
+#include <vector>
 
-struct Node {
-  int value_;
-  Node* left_;
-  Node* right_;
+template <typename T>
+struct Node final {
+  T value_;
+  std::unique_ptr<Node> left_;   // pointer to the left node
+  std::unique_ptr<Node> right_;  // pointer to the right node
+  uint32_t count_; // keeping track of nodes that are duplicates
 
-  Node() : value_(0), left_(nullptr), right_(nullptr) {}
-  explicit Node(int value) : value_(value), left_(nullptr), right_(nullptr) {}
+  Node() : value_({}), left_(nullptr), right_(nullptr), count_(0) {}
+  ~Node() { std::cout << "Node " << this->value_ << " destroyed!\n"; }
+  explicit Node(int value) : value_(value), left_(nullptr), right_(nullptr), count_(1) {}
 };
 
-struct BinarySearchTree final : Node {
-  Node* root_;
+template <typename T>
+struct BinarySearchTree final {
+  std::unique_ptr<Node<T>> root_;
 
   BinarySearchTree() : root_(nullptr) {}
-  explicit BinarySearchTree(int value) : root_(new Node(value)) {}
+  explicit BinarySearchTree(int value)
+      : root_(std::make_unique<Node<T>>(value)) {}
 
-  Node* get_root() const noexcept { return root_; }
+  [[nodiscard]] Node<T>* get_root() const noexcept { return root_.get(); }
 
-  // Insert
-  void insert_node(int value) {
+  [[nodiscard]] bool operator==(BinarySearchTree<T> *rhs) const noexcept {
+    // todo traverse and check? or flatten to an array then check?
+    return this->root_->value_ == rhs->root_->value_;
+  }
+
+  int height(Node<T>* current_node) const noexcept {
+    // if we are in an empty node we don't count it as part
+    // of the height. Height of the last non-empty node is zero
+    if (current_node == nullptr) /* empty */ {
+      return -1;
+    }
+
+    if (current_node->left_ == nullptr && current_node->right_ == nullptr) {
+      return 0;
+    }
+
+    return std::max(1 + height(current_node->left_.get()), 1 + height(current_node->right_.get()));
+  }
+
+  [[nodiscard]] int balance_factor() const noexcept {
+    // we get the height of the left and right subarray
+    // we add 1 to them assuming we already counted the root_node in height(root_node)
+    const Node<T>* current_node = get_root();
+    const int left_height = 1 + height(current_node->left_.get());
+    const int right_height = 1 + height(current_node->right_.get());
+
+    return std::abs(left_height - right_height);
+  }
+  /**
+   * Inserts a node into the BST
+   * @param value
+   */
+  void insert_node(T value) {
+    // Create a new node if the BST is empty
     if (get_root() == nullptr) {
-      root_ = new BinarySearchTree(value);
+      root_ = std::make_unique<Node<T>>(value);
       return;
     }
 
-    Node* current_node = root_;
-    Node* parent_node = new Node();
+    // get the pointer of the current node
+    Node<T>* current_node = root_.get();
 
+    // add a pointer to the parent node
+    // at this point it's NULL
+    Node<T>* parent_node;
+
+    // keep on traversing until the current_node is already null/empty
     while (current_node != nullptr) {
+      // update the parent node, this will act as the parent
+      // of the inserted nodes
       parent_node = current_node;
-      if (value < current_node->value_) {
-        current_node = current_node->left_;
+      // if value is less than the current node value; update current_node to
+      // move left otherwise; update current_node to move right
+      if (value == current_node->value_) {
+        current_node->count_++;
+        return;
+      } else if (value < current_node->value_) {
+        current_node = current_node->left_.get();
       } else {
-        current_node = current_node->right_;
+        current_node = current_node->right_.get();
       }
     }
 
-    // from this part we have a value for parent_node
+    // at this point we are on the parent node which has, 1 or empty child nodes
+    // we insert the new node to that empty/null child.
     if (value < parent_node->value_) {
-      parent_node->left_ = new Node(value);
+      parent_node->left_ = std::make_unique<Node<T>>(value);
     } else {
-      parent_node->right_ = new Node(value);
+      parent_node->right_ = std::make_unique<Node<T>>(value);
     }
   }
 
   // Pre-order traversal
   // dfs like
-  void pre_order_traversal(Node* current_node) const noexcept {
+  void pre_order_traversal(Node<T>* current_node) const noexcept {
     if (current_node != nullptr) {
       std::cout << current_node->value_ << "\n";
-      pre_order_traversal(current_node->left_);
-      pre_order_traversal(current_node->right_);
+      pre_order_traversal(current_node->left_.get());
+      pre_order_traversal(current_node->right_.get());
     }
   }
 
-  // Search
-  // O(n) -> "n" is the number of nodes
-  Node* search_node(int value) const noexcept {
+  void post_order_traversal(Node<T>* current_node, std::vector<T> &flat_tree) const noexcept {
+    if (current_node != nullptr) {
+      post_order_traversal(current_node->left_.get(), flat_tree);
+      post_order_traversal(current_node->right_.get(), flat_tree);
+      flat_tree.push_back(current_node->value_);
+    }
+  }
+
+  void in_order_traversal(Node<T>* current_node, std::vector<T> &flat_tree) const noexcept {
+    if (current_node != nullptr) {
+      in_order_traversal(current_node->left_.get(), flat_tree);
+      flat_tree.push_back(current_node->value_);
+      in_order_traversal(current_node->right_.get(), flat_tree);
+    }
+  }
+
+  /**
+   * Iteratively searches the element in the three
+   *
+   * O(n) - worst case
+   *
+   * @param value
+   * @return
+   */
+  Node<T>* search_node(T value) const noexcept {
+    // if BST is empty then return nullptr
     if (get_root() == nullptr) {
       return nullptr;
     }
 
-    Node* current_node = root_;
+    // set the current node to be the root node
+    // and start traversing
+    Node<T>* current_node = root_.get();
+
+    // traverse the tree if the current node isn't a nullptr
+    // and if the value isn't the value we're looking for
     while (current_node != nullptr && value != current_node->value_) {
+      // if value is less than the current node's value
+      // we move left, otherwise right
       if (value < current_node->value_) {
-        current_node = current_node->left_;
+        current_node = current_node->left_.get();
       } else {
-        current_node = current_node->right_;
+        current_node = current_node->right_.get();
       }
     }
 
+    // at this point we are pointing to the node we searched for
     if (current_node != nullptr) {
       return current_node;
     }
@@ -78,95 +161,122 @@ struct BinarySearchTree final : Node {
     return nullptr;
   }
 
-  // helper function to find the smallest node in the right subtree
-  static Node* find_smallest_node(Node* current_node) {
-    Node* temp_node = current_node;
-    while (temp_node->left_ != nullptr) {
-      temp_node = temp_node->left_;
+  /**
+   * Recursively searches for an element in the tree
+   *
+   * @param current_node
+   * @param value
+   * @return
+   */
+  static Node<T>* search_recursive(Node<T>* current_node, T value) noexcept {
+    if (current_node == nullptr) {
+      return nullptr;
     }
 
-    // should have the smallest node in the right subtree
-    return temp_node;
+    if (value == current_node->value_) {
+      return current_node;
+    }
+
+    if (value < current_node->value_) {
+      return search_recursive(current_node->left_.get(), value);
+    } else {
+      return search_recursive(current_node->right_.get(), value);
+    }
   }
 
-  // Delete
-  bool delete_node(Node* current_node, int value) {
-    // empty list
-    if (current_node == nullptr) {
-      return false;
+  static Node<T>* find_smallest_node_right_subtree(Node<T>* current_node) {
+    if (current_node->left_ != nullptr) {
+      return find_smallest_node_right_subtree(current_node->left_.get());
     }
 
-    Node* parent_node = new Node();
+    return current_node;
+  }
 
-    // find value in binary_search_tree
-    while (current_node != nullptr && value != current_node->value_) {
-      parent_node = current_node;
-      if (value < current_node->value_) {
-        current_node = current_node->left_;
-      } else {
-        current_node = current_node->right_;
-      }
-    }
+    /**
+     * Delete a node in the tree
+     *
+     * @param current_node
+     * @param value
+     * @return
+     */
+     auto delete_node(Node<T>* current_node, T value) -> bool {
+       // 1. Delete a node in an empty tree
+       if (current_node == nullptr) {
+         return false;
+       }
 
-    // if we didn't find the value
-    if (current_node == nullptr) {
-      return false;
-    } else if (current_node->left_ == nullptr &&
-               current_node->right_ == nullptr) /*leaf node*/ {
-      if (root_->value_ == current_node->value_) {
-        delete root_;
-        root_ = nullptr;
-        return true;
-      } else if (value < parent_node->value_) {
-        delete parent_node->left_;
-        parent_node->left_ = nullptr;
-        return true;
-      } else {
-        delete parent_node->right_;
-        parent_node->right_ = nullptr;
-        return true;
-      }
-    } else if (current_node->right_ == nullptr) /*node has left child only*/ {
-      if (root_->value_ == current_node->value_) {
-        delete root_;
-        root_ = current_node->left_;
-        return true;
-      } else if (value < parent_node->value_) {
-        delete parent_node->left_;
-        parent_node->left_ = current_node->left_;
-        return true;
-      } else {
-        delete parent_node->right_;
-        parent_node->right_ = current_node->left_;
-        return true;
-      }
-    } else if (current_node->left_ == nullptr) /*node has left child only*/ {
-      if (root_->value_ == current_node->value_) {
-        delete root_;
-        root_ = current_node->right_;
-        return true;
-      } else if (value < parent_node->value_) {
-        delete parent_node->left_;
-        parent_node->left_ = current_node->right_;
-        return true;
-      } else {
-        delete parent_node->right_;
-        parent_node->right_ = current_node->right_;
-        return true;
-      }
-    } else /* deleting node with 2 children */ {
-      Node* smallest_node_right = find_smallest_node(current_node->right_);
-      int val_of_smallest_node = smallest_node_right->value_;
-      // Find and delete the that least smallest node.
-      delete_node(
-          root_,
-          val_of_smallest_node);  // usually goes into delete lead node case
-      // Switch the deleted node
-      current_node->value_ = val_of_smallest_node;
+       // parent node
+       Node<T>* parent_node = current_node;
+
+       // search for the element
+       // need to implement search here since we need to update
+       // the parent node
+       while (current_node != nullptr && value != current_node->value_) {
+         parent_node = current_node;
+         if (value < current_node->value_) {
+           current_node = current_node->left_.get();
+         } else {
+           current_node = current_node->right_.get();
+         }
+       }
+
+       if (current_node->count_ > 1) {
+         current_node->count_--;
+         return true;
+       }
+
+      // if we didn't find what we're looking for
+       if (current_node == nullptr) {
+         return false;
+       } else if (current_node->left_ == nullptr && current_node->right_ == nullptr) /* leaf node */ {
+         std::cout << "delete leaf only!\n";
+         //additional constraint if the BST has only a root node
+         if (root_.get() == current_node) {
+           root_ = nullptr;
+         }
+
+         if (value < parent_node->value_) {
+           // point the parent node's left to nullptr
+           // this will also clean up the unique_ptr
+           parent_node->left_ = nullptr;
+         } else {
+           // point the parent node's left to nullptr
+           // this will also clean up the unique_ptr
+           parent_node->right_ = nullptr;
+         }
+       } else if (current_node->right_ == nullptr) /* left child only */ {
+         std::cout << "left child only!\n";
+         // depending on the value constraints
+         // we must overwrite the node that we deleted with its child node
+         // overwriting in turn will remove the previous Node object
+         if (value < parent_node->value_) {
+           parent_node->left_ = std::move(current_node->left_);
+         } else {
+           parent_node->right_ = std::move(current_node->left_);
+         }
+       } else if (current_node->left_ == nullptr) /* right child only */ {
+         std::cout << "right child only!\n";
+         // depending on the value constraints
+         // we must overwrite the node that we deleted with its child node
+         // overwriting in turn will remove the previous Node object
+         if (value < parent_node->value_) {
+           parent_node->left_ = std::move(current_node->right_);
+         } else {
+           parent_node->right_ = std::move(current_node->right_);
+         }
+       } else /* has 2 children */ {
+         std::cout << "2 children\n";
+         // find the smallest node in the right subtree
+         Node<T>* smallest_node = find_smallest_node_right_subtree(current_node->right_.get());
+         const auto value_of_smallest_node = smallest_node->value_;
+         // delete the smallest node in the right subtree
+         // in the context of current_node
+         std::ignore = delete_node(root_.get(), value_of_smallest_node);
+
+         // replace the "value to be deleted" with the smallest value
+         current_node->value_ = value_of_smallest_node;
+       }
 
       return true;
-    }
-
-    return false;
-  }
+     }
 };

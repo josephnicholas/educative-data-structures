@@ -5,8 +5,8 @@
 #include "max_heap.hpp"
 #include "min_heap.hpp"
 
-int main(int argc, char* argv[]) {
-  auto max_heap = std::make_unique<MaxHeap<int>>();
+int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
+  const auto max_heap = std::make_unique<MaxHeap<int>>();
   max_heap->insert(2);
   max_heap->insert(8);
   max_heap->insert(15);
@@ -18,8 +18,7 @@ int main(int argc, char* argv[]) {
   max_heap->remove_max();
   std::cout << max_heap->get_max() << "\n";
 
-
-  auto max_heap_2 = std::make_unique<MaxHeap<int>>();
+  const auto max_heap_2 = std::make_unique<MaxHeap<int>>();
   max_heap_2->insert(3);
   int nums[] = {2,3,1,2,4,5,5,6};
   max_heap_2->build_heap(nums, 8);

@@ -1,1 +1,0 @@
-add_executable(linkedlist-test main.cc linkedlist.hpp node.hpp)

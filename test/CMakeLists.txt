@@ -1,5 +1,8 @@
+enable_testing()
+
 include(CTest)
 include(Catch)
+include(GoogleTest)
 
 add_library(catch_main STATIC catch_main.cc)
 target_include_directories(catch_main PUBLIC ${Catch2_INCLUDES})
@@ -11,9 +14,32 @@ target_include_directories(catch_main PUBLIC ${CMAKE_SOURCE_DIR}/trie)
 target_link_libraries(trie-test PRIVATE catch_main)
 
 message(STATUS "${GTest_INCLUDES} - ${GTest_SYSTEM_LIBS}")
+
 add_executable(graph-test graph_test.cc)
 target_include_directories(graph-test
         PUBLIC ${CMAKE_SOURCE_DIR}/graph
         ${CMAKE_SOURCE_DIR}/linkedlist
         ${GTest_INCLUDES})
-target_link_libraries(graph-test PUBLIC ${GTest_LIBS} ${GTest_SYSTEM_LIBS})
+target_link_libraries(graph-test PUBLIC
+        ${GTest_LIBS}
+        ${GTest_SYSTEM_LIBS})
+
+add_executable(linkedlist-test linkedlist_test.cc)
+target_include_directories(linkedlist-test
+        PUBLIC ${CMAKE_SOURCE_DIR}/linkedlist
+        ${GTest_INCLUDES})
+
+target_link_libraries(linkedlist-test
+        PUBLIC ${GTest_LIBS}
+        ${GTest_SYSTEM_LIBS})
+
+add_executable(bst-test bst_test.cc)
+target_include_directories(bst-test
+        PUBLIC ${CMAKE_SOURCE_DIR}/binary_search_tree
+        ${GTest_INCLUDES})
+
+target_link_libraries(bst-test
+        PUBLIC ${GTest_LIBS}
+        ${GTest_SYSTEM_LIBS})
+
+gtest_discover_tests(linkedlist-test graph-test bst-test)

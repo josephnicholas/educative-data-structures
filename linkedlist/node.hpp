@@ -1,27 +1,29 @@
 #include <string>
 #include <memory>
 
+template<typename T>
 class Node final {
     public:
-        explicit Node() : next_element_(nullptr) {}
+        explicit Node() : next_node_(nullptr) {}
+        explicit Node(T data) : data_(data), next_node_(nullptr) {}
 
-        inline void set_node_data(int data) {
+        inline void set_node_data(T data) {
             data_ = data;
         }
 
-        [[nodiscard]] inline int get_node_data() const noexcept {
+        [[nodiscard]] inline auto get_node_data() const noexcept -> int {
             return data_;
         }
 
-        inline void set_next_node(std::shared_ptr<Node> next_node) {
-            next_element_ = std::move(next_node);
+        inline void set_next_node(std::shared_ptr<Node> next_node) noexcept {
+            next_node_ = std::move(next_node);
         }
 
-        [[nodiscard]] inline std::shared_ptr<Node> get_next_node() const noexcept {
-            return next_element_;
+        [[nodiscard]] inline auto get_next_node() const noexcept -> std::shared_ptr<Node> {
+            return next_node_;
         }
 
     private:
-        int data_{};
-        std::shared_ptr<Node> next_element_{nullptr};
+        T data_{};
+        std::shared_ptr<Node> next_node_{nullptr};
 };

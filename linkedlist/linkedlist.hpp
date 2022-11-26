@@ -1,23 +1,25 @@
-#include "node.hpp"
 #include <cstddef>
 #include <iostream>
 #include <cmath>
 #include <string>
 
+#include "node.hpp"
+
+template<typename T>
 class LinkedList final {
     public:
-        explicit LinkedList() : head_(nullptr) {}
+        LinkedList() = default;
+        ~LinkedList() = default;
 
-        [[maybe_unused]] inline void insert_at(int data, int n) {}
+        [[maybe_unused]] inline void insert_at(T data, int n) {}
 
-        inline void insert_at_tail(int data) {
-            
-            // traverse the the list until it is a nullptr(tail)
+        inline void insert_at_tail(T data) {
+            // traverse the list until it is a nullptr(tail)
             if (is_empty()) {
                 insert_at_head(data);
             } else {
-                auto new_node = std::make_shared<Node>();
-                std::shared_ptr<Node> tail_node = head_;
+                auto new_node = std::make_shared<Node<T>>();
+                std::shared_ptr<Node<T>> tail_node = head_;
 
                 while(tail_node->get_next_node() != nullptr) {
                     tail_node = tail_node->get_next_node();
@@ -30,8 +32,8 @@ class LinkedList final {
             }
         }
 
-        inline void insert_at_head(int data) {
-            const auto new_node = std::make_shared<Node>();
+        inline void insert_at_head(T data) {
+            const auto new_node = std::make_shared<Node<T>>();
 
             new_node->set_node_data(data);
             new_node->set_next_node(head_);
@@ -40,7 +42,7 @@ class LinkedList final {
             size_++;
         }
 
-        bool delete_data_at_head() {
+        [[nodiscard]] inline bool delete_data_at_head() noexcept {
             if (is_empty()) {
                 return false;
             }
@@ -57,9 +59,27 @@ class LinkedList final {
             return true;
         }
 
-        [[maybe_unused]] inline void delete_data_at_tail() {}
+        [[nodiscard]] inline bool delete_data_at_tail() const noexcept {
+            if (is_empty()) {
+                return false;
+            }
 
-        [[nodiscard]] inline auto delete_data(int data) {
+            // get the second to the last
+            // element in the list
+            auto element_before_tail = head_.get();
+            while (element_before_tail->get_next_node()->get_next_node() != nullptr) {
+                element_before_tail = element_before_tail->get_next_node().get();
+            }
+
+            // set the tail node to be nullptr
+            // it means deleted
+            element_before_tail->get_next_node().reset();
+            element_before_tail->set_next_node(nullptr);
+
+            return true;
+        }
+
+        [[nodiscard]] inline auto delete_data(T data) {
             if(is_empty()) {
                 return false;
             }
@@ -87,7 +107,7 @@ class LinkedList final {
             return false;
         }
 
-        [[nodiscard]] inline auto search(int data) {
+        [[nodiscard]] inline auto search(T data) {
             if (is_empty()) {
                 return false;
             } 
@@ -128,9 +148,9 @@ class LinkedList final {
         }
 
         inline void reverse() {
-            std::shared_ptr<Node> previous_node = nullptr; // Previous node for tracking will be used for swapping links
+            std::shared_ptr<Node<T>> previous_node = nullptr; // Previous node for tracking will be used for swapping links
             auto current_node = get_head();
-            std::shared_ptr<Node> next_node = nullptr; // Points to the current node's next node.
+            std::shared_ptr<Node<T>> next_node = nullptr; // Points to the current node's next node.
 
             while (current_node != nullptr) {
                 next_node = current_node->get_next_node();
@@ -149,7 +169,7 @@ class LinkedList final {
                 return head_;
             } 
 
-            Node* previous_node = nullptr;
+            Node<T>* previous_node = nullptr;
             auto current_node = head_;
 
             return current_node;
@@ -163,8 +183,8 @@ class LinkedList final {
             }
 
             auto current_node = head_;
-            std::shared_ptr<Node> advanced_node = nullptr;
-            std::shared_ptr<Node> dup = nullptr;
+            std::shared_ptr<Node<T>> advanced_node = nullptr;
+            std::shared_ptr<Node<T>> dup = nullptr;
 
             while (current_node != nullptr) {
                 advanced_node = current_node;
@@ -184,7 +204,7 @@ class LinkedList final {
             }
         }
 
-        static auto union_list(LinkedList* first, LinkedList* second) {
+        static auto union_list(std::unique_ptr<LinkedList> first, std::unique_ptr<LinkedList> second) {
             auto current_node = second->get_head();
             while (current_node != nullptr) {
                 first->insert_at_tail(current_node->get_node_data());
@@ -380,6 +400,6 @@ class LinkedList final {
         **/
 
     private:
-        std::shared_ptr<Node> head_; // start of the list
+        std::shared_ptr<Node<T>> head_{}; // start of the list
         int size_ = 0;
 };

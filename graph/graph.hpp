@@ -8,16 +8,17 @@
 
 #include "linkedlist.hpp"
 
+template<typename T>
 class Graph final {
   int total_number_of_vertices{};
 
   // array of multiple linkedlist
   // should be equal to the number of vertices in the graph
-  std::vector<LinkedList> array_of_linked_list{};
+  std::vector<LinkedList<T>> array_of_linked_list{};
 
  public:
   explicit Graph(int vertices)
-      : array_of_linked_list{std::vector<LinkedList>(vertices)},
+      : array_of_linked_list{std::vector<LinkedList<T>>(vertices)},
         total_number_of_vertices{vertices} {}
 
   [[maybe_unused]] inline void add_edge_directed(int source, int destination) {
@@ -52,7 +53,7 @@ class Graph final {
     }
 
     std::cout << "Adjacency List of Directed graph\n";
-    Node *temp_node;
+    std::shared_ptr<Node<T>> temp_node;
 
     for (int i = 0; i < total_number_of_vertices; i++) {
       std::cout << "|" << i << "| => ";
@@ -60,7 +61,7 @@ class Graph final {
 
       while (temp_node != nullptr) {
         std::cout << "[" << temp_node->get_node_data() << "] -> ";
-        temp_node = temp_node->get_next_node();
+        temp_node = std::move(temp_node->get_next_node());
       }
       std::cout << "NULL\n";
     }

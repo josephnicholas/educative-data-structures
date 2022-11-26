@@ -6,8 +6,8 @@
 #include "graph.hpp"
 
 // O(V + E)
-auto bfs_traversal(const Graph &graph) {
-  auto adjacency_list = graph.get_adjacency_list();
+auto bfs_traversal(const Graph<int> &graph) {
+  const auto adjacency_list = graph.get_adjacency_list();
   std::unordered_set<int> visited_set{};
   std::queue<int> to_visit_queue{};
   std::string result;
@@ -44,7 +44,7 @@ auto bfs_traversal(const Graph &graph) {
 }
 
 // O(V+E)
-auto dfs_traversal(const Graph &graph) {
+auto dfs_traversal(const Graph<int> &graph) {
   auto adjacency_list = graph.get_adjacency_list();
   std::unordered_set<int> visited_set{};
   std::stack<int> to_visit_stack{};
@@ -84,7 +84,7 @@ auto dfs_traversal(const Graph &graph) {
 
 //O(V + E)
 // but maybe O(V(V + E))
-[[maybe_unused]] [[nodiscard]] int find_mother_vertex(const Graph &graph) {
+[[maybe_unused]] [[nodiscard]] int find_mother_vertex(const Graph<int> &graph) {
   if (graph.get_total_number_of_vertices() < 1) {
     return -1;
   }
@@ -109,13 +109,13 @@ auto dfs_traversal(const Graph &graph) {
 
       already_visited_nodes.emplace(current_visited_node);
 
-      Node* adjacent_node = adjacency_list[current_visited_node].get_head();
+      auto adjacent_node = adjacency_list[current_visited_node].get_head();
       while (adjacent_node != nullptr) {
         if(!already_visited_nodes.emplace(adjacent_node->get_node_data()).second) {
           break;
         }
         nodes_to_visit.emplace(adjacent_node->get_node_data());
-        adjacent_node = adjacent_node->get_next_node();
+        adjacent_node = std::move(adjacent_node->get_next_node());
       }
 
     }
@@ -128,7 +128,7 @@ auto dfs_traversal(const Graph &graph) {
   return -1;
 }
 
-int num_edges(const Graph &graph) {
+int num_edges(const Graph<int> &graph) {
   return 0;
 }
 
@@ -156,7 +156,7 @@ int main() {
   //
   //  graph_undirected->print_graph();
   //
-  auto graph_bfs = std::make_unique<Graph>(7);
+  auto graph_bfs = std::make_unique<Graph<int>>(7);
   graph_bfs->add_edge_directed(1, 2);
   graph_bfs->add_edge_directed(1, 3);
   graph_bfs->add_edge_directed(1, 4);
@@ -175,7 +175,7 @@ int main() {
 
   std::cout << "\n===dfs===\n";
 
-  auto graph_dfs = std::make_unique<Graph>(5);
+  auto graph_dfs = std::make_unique<Graph<int>>(5);
   graph_dfs->add_edge_directed(0, 1);
   graph_dfs->add_edge_directed(0, 2);
   graph_dfs->add_edge_directed(1, 4);
@@ -190,7 +190,7 @@ int main() {
 
   std::cout << "\n===mother_node===\n";
 
-  auto graph_mother_node = std::make_unique<Graph>(4);
+  auto graph_mother_node = std::make_unique<Graph<int>>(4);
   graph_mother_node->add_edge_directed(0, 1);
   graph_mother_node->add_edge_directed(1, 2);
   graph_mother_node->add_edge_directed(3, 0);
