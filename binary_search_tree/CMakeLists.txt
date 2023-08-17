@@ -1,1 +1,0 @@
-add_executable(binary_search_tree binary_search_tree.hpp main.cc)

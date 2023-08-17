@@ -12,7 +12,7 @@ struct LinkedListTestShould : public ::testing::Test {
 };
 
 TEST_F(LinkedListTestShould, InsertAtHead) {
-  static constexpr auto num_of_elements{7};
+  static constexpr unsigned int num_of_elements{7};
   linked_list_->insert_at_head(1);
   linked_list_->insert_at_head(2);
   linked_list_->insert_at_head(3);
@@ -24,6 +24,136 @@ TEST_F(LinkedListTestShould, InsertAtHead) {
   EXPECT_EQ(linked_list_->size(), num_of_elements);
   EXPECT_EQ(linked_list_->get_head()->get_node_data(), 7);
   EXPECT_NE(linked_list_, nullptr);
+}
+
+TEST_F(LinkedListTestShould, InsertAtTail) {
+  static constexpr unsigned int num_of_elements{7};
+  linked_list_->insert_at_tail(1);
+  linked_list_->insert_at_tail(2);
+  linked_list_->insert_at_tail(3);
+  linked_list_->insert_at_tail(4);
+  linked_list_->insert_at_tail(5);
+  linked_list_->insert_at_tail(6);
+  linked_list_->insert_at_tail(7);
+
+  EXPECT_EQ(linked_list_->size(), num_of_elements);
+  EXPECT_EQ(linked_list_->get_head()->get_node_data(), 1);
+  EXPECT_NE(linked_list_, nullptr);
+}
+
+TEST_F(LinkedListTestShould, InsertAfterNth) {
+  static constexpr unsigned int num_of_elements{5};
+  linked_list_->insert_at_tail(1);
+  linked_list_->insert_at_tail(2);
+  linked_list_->insert_at_tail(3);
+  linked_list_->insert_at_tail(4);
+  linked_list_->insert_at(5, 2);
+
+  EXPECT_EQ(linked_list_->size(), num_of_elements);
+  EXPECT_EQ(linked_list_->get_head()->get_node_data(), 1);
+  EXPECT_EQ(linked_list_->get_tail(linked_list_->get_head())->get_node_data(), 4);
+  EXPECT_NE(linked_list_, nullptr);
+}
+
+TEST_F(LinkedListTestShould, DeleteHead) {
+  static constexpr unsigned int num_of_elements{3};
+  linked_list_->insert_at_head(1);
+  linked_list_->insert_at_head(2);
+  linked_list_->insert_at_head(3);
+  linked_list_->insert_at_head(4);
+  EXPECT_TRUE(linked_list_->delete_data_at_head());
+
+  EXPECT_FALSE(linked_list_->search(4));
+  EXPECT_EQ(linked_list_->size(), num_of_elements);
+  EXPECT_EQ(linked_list_->get_head()->get_node_data(), 3);
+  EXPECT_EQ(linked_list_->get_tail(linked_list_->get_head())->get_node_data(), 1);
+  EXPECT_NE(linked_list_, nullptr);
+}
+
+TEST_F(LinkedListTestShould, DeleteByValue) {
+  static constexpr unsigned int num_of_elements{3};
+  linked_list_->insert_at_head(1);
+  linked_list_->insert_at_head(2);
+  linked_list_->insert_at_head(3);
+  linked_list_->insert_at_head(4);
+  EXPECT_TRUE(linked_list_->delete_data(3));
+
+  EXPECT_EQ(linked_list_->size(), num_of_elements);
+  EXPECT_FALSE(linked_list_->search(3));
+}
+
+TEST_F(LinkedListTestShould, DeleteByValueNotFound) {
+  static constexpr unsigned int num_of_elements{4};
+  linked_list_->insert_at_head(1);
+  linked_list_->insert_at_head(2);
+  linked_list_->insert_at_head(3);
+  linked_list_->insert_at_head(4);
+  EXPECT_FALSE(linked_list_->delete_data(5));
+
+  EXPECT_EQ(linked_list_->size(), num_of_elements);
+}
+
+TEST_F(LinkedListTestShould, Reverse) {
+  static constexpr unsigned int num_of_elements{4};
+  linked_list_->insert_at_head(1);
+  linked_list_->insert_at_head(2);
+  linked_list_->insert_at_head(3);
+  linked_list_->insert_at_head(4);
+  linked_list_->reverse();
+
+  const auto list_expected = std::make_unique<LinkedList<int>>();
+  list_expected->insert_at_tail(1);
+  list_expected->insert_at_tail(2);
+  list_expected->insert_at_tail(3);
+  list_expected->insert_at_tail(4);
+
+  EXPECT_EQ(linked_list_->size(), num_of_elements);
+  EXPECT_EQ(list_expected->size(), num_of_elements);
+  EXPECT_TRUE(linked_list_->equal(list_expected.get()));
+}
+
+TEST_F(LinkedListTestShould, DetectLoop) {
+  linked_list_->insert_at_head(1);
+  linked_list_->insert_at_head(2);
+  linked_list_->insert_at_head(3);
+  linked_list_->insert_at_head(4);
+  linked_list_->insert_loop();
+  EXPECT_TRUE(linked_list_->detect_loop());
+}
+
+TEST_F(LinkedListTestShould, ReturnMidNode) {
+  linked_list_->insert_at_head(1);
+  linked_list_->insert_at_head(2);
+  linked_list_->insert_at_head(3);
+  linked_list_->insert_at_head(4);
+
+  EXPECT_EQ(linked_list_->mid()->get_node_data(), 3);
+
+  linked_list_->insert_at_head(5);
+  EXPECT_EQ(linked_list_->mid()->get_node_data(), 3);
+}
+
+TEST_F(LinkedListTestShould, RemoveDuplicates) {
+  linked_list_->insert_at_head(7);
+  linked_list_->insert_at_head(22);
+  linked_list_->insert_at_head(14);
+  linked_list_->insert_at_head(21);
+  linked_list_->insert_at_head(14);
+  linked_list_->insert_at_head(7);
+
+  linked_list_->remove_duplicates();
+  linked_list_->print_list();
+}
+
+TEST_F(LinkedListTestShould, NthNodeFromTail) {
+  linked_list_->insert_at_head(21);
+  linked_list_->insert_at_head(14);
+  linked_list_->insert_at_head(7);
+  linked_list_->insert_at_head(8);
+  linked_list_->insert_at_head(22);
+  linked_list_->insert_at_head(15);
+
+  EXPECT_EQ(linked_list_->get_nth(4)->get_node_data(), 8);
 }
 
 TEST_F(LinkedListTestShould, FindUniqueInLinkedList) {
@@ -99,6 +229,7 @@ TEST_F(LinkedListTestShould, DeleteAtTail) {
     EXPECT_EQ(nullptr, head_of_one->get_next_node());
     EXPECT_EQ(nullptr, head_of_expected->get_next_node());
 }
+
 // TODO
 /*
 int main(int argc, char* argv[]) {

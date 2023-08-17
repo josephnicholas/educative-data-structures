@@ -10,36 +10,41 @@ target_include_directories(catch_main PUBLIC ${Catch2_INCLUDES})
 target_link_libraries(catch_main PUBLIC Catch2::Catch2)
 
 add_executable(trie-test trie_test.cc)
-target_include_directories(catch_main PUBLIC ${CMAKE_SOURCE_DIR}/trie)
-target_link_libraries(trie-test PRIVATE catch_main)
+target_include_directories(catch_main
+        PUBLIC ${CMAKE_SOURCE_DIR}/src/trie)
+target_link_libraries(trie-test
+        PRIVATE catch_main)
 
-message(STATUS "${GTest_INCLUDES} - ${GTest_SYSTEM_LIBS}")
+message(STATUS "${GTest_INCLUDE_DIRS} - ${GTest_LIBRARIES}")
 
 add_executable(graph-test graph_test.cc)
 target_include_directories(graph-test
-        PUBLIC ${CMAKE_SOURCE_DIR}/graph
-        ${CMAKE_SOURCE_DIR}/linkedlist
-        ${GTest_INCLUDES})
+        PUBLIC ${CMAKE_SOURCE_DIR}/src/graph
+        ${CMAKE_SOURCE_DIR}/src/linkedlist
+        ${GTest_INCLUDE_DIRS})
 target_link_libraries(graph-test PUBLIC
-        ${GTest_LIBS}
-        ${GTest_SYSTEM_LIBS})
+        ${GTest_LIBRARIES})
 
 add_executable(linkedlist-test linkedlist_test.cc)
 target_include_directories(linkedlist-test
-        PUBLIC ${CMAKE_SOURCE_DIR}/linkedlist
-        ${GTest_INCLUDES})
-
+        PUBLIC ${CMAKE_SOURCE_DIR}/src/linkedlist
+        ${GTest_INCLUDE_DIRS})
 target_link_libraries(linkedlist-test
-        PUBLIC ${GTest_LIBS}
-        ${GTest_SYSTEM_LIBS})
+        PUBLIC ${GTest_LIBRARIES})
+
+add_executable(doubly-linkedlist-test doubly_linkedlist_test.cc)
+target_include_directories(doubly-linkedlist-test
+        PUBLIC ${CMAKE_SOURCE_DIR}/src/doubly_linkedlist
+        ${GTest_INCLUDE_DIRS})
+target_link_libraries(doubly-linkedlist-test
+        PUBLIC ${GTest_LIBRARIES})
 
 add_executable(bst-test bst_test.cc)
 target_include_directories(bst-test
-        PUBLIC ${CMAKE_SOURCE_DIR}/binary_search_tree
-        ${GTest_INCLUDES})
-
+        PUBLIC ${CMAKE_SOURCE_DIR}/src/binary_search_tree
+        ${GTest_INCLUDE_DIRS})
 target_link_libraries(bst-test
-        PUBLIC ${GTest_LIBS}
-        ${GTest_SYSTEM_LIBS})
+        PUBLIC ${GTest_LIBRARIES}
+        ${GTest_SYSTEM_LIBRARIES})
 
-gtest_discover_tests(linkedlist-test graph-test bst-test)
+gtest_discover_tests(doubly-linkedlist-test linkedlist-test graph-test bst-test)

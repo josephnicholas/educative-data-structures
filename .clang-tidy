@@ -1,0 +1,21 @@
+# Generated from CLion Inspection settings
+---
+Checks: '-*,
+google-default-arguments,
+google-explicit-constructor,
+google-runtime-operator,
+hicpp-exception-baseclass,
+hicpp-multiway-paths-covered,
+mpi-buffer-deref,
+mpi-type-mismatch,
+openmp-use-default-none,
+portability-*,
+cert-*,
+clang-analyzer-*,
+misc-*,
+objc-*,
+bugprone-*,
+cppcoreguidelines-*,
+modernize-*,
+performance-*,
+readability-*'

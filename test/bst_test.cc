@@ -1,5 +1,4 @@
 #include "binary_search_tree.hpp"
-
 #include "gtest/gtest.h"
 
 struct BinarySearchTreeShould : public ::testing::Test {
@@ -10,9 +9,7 @@ struct BinarySearchTreeShould : public ::testing::Test {
     tree_sut->insert_node(3);
   }
 
-  void TearDown() override {
-
-  }
+  void TearDown() override {}
 
   std::unique_ptr<BinarySearchTree<int>> tree_sut{};
 };
@@ -31,8 +28,48 @@ TEST_F(BinarySearchTreeShould, InsertDuplicateValuesInTheTree) {
   tree->insert_node(3);
   tree->insert_node(4);
 
-  Node<int>* found_node = tree->search_recursive(tree->get_root(), 1);
+  Node<int>* found_node =
+      BinarySearchTree<int>::search_recursive(tree->get_root(), 1);
   EXPECT_EQ(2, found_node->count_);
+}
+
+TEST_F(BinarySearchTreeShould, DeleteRootNode) {
+  const auto tree = std::make_unique<BinarySearchTree<int>>(10);
+  tree->insert_node(5);
+  tree->insert_node(15);
+  tree->insert_node(2);
+  tree->insert_node(6);
+  tree->insert_node(1);
+  tree->insert_node(13);
+  tree->insert_node(22);
+  tree->insert_node(12);
+  tree->insert_node(14);
+
+  EXPECT_TRUE(tree->delete_node(tree->get_root(), 10));
+  EXPECT_EQ(BinarySearchTree<int>::search_recursive(tree->get_root(), 10),
+            nullptr);
+}
+
+TEST_F(BinarySearchTreeShould, DeleteRootNodeOfRightSkewedTree) {
+  const auto tree = std::make_unique<BinarySearchTree<int>>(1);
+  tree->insert_node(2);
+  tree->insert_node(3);
+  tree->insert_node(4);
+
+  EXPECT_TRUE(tree->delete_node(tree->get_root(), 1));
+  EXPECT_EQ(BinarySearchTree<int>::search_recursive(tree->get_root(), 1),
+            nullptr);
+}
+
+TEST_F(BinarySearchTreeShould, DeleteRootNodeOfLeftSkewedTree) {
+  const auto tree = std::make_unique<BinarySearchTree<int>>(1);
+  tree->insert_node(-2);
+  tree->insert_node(-3);
+  tree->insert_node(-4);
+
+  EXPECT_TRUE(tree->delete_node(tree->get_root(), 1));
+  EXPECT_EQ(BinarySearchTree<int>::search_recursive(tree->get_root(), 1),
+            nullptr);
 }
 
 TEST_F(BinarySearchTreeShould, DeleteNodeWith2Children) {
@@ -46,9 +83,11 @@ TEST_F(BinarySearchTreeShould, DeleteNodeWith2Children) {
   tree->insert_node(10);
   tree->insert_node(14);
 
-  EXPECT_EQ(BinarySearchTree<int>::search_recursive(tree->get_root(), 9)->value_, 9);
+  EXPECT_EQ(
+      BinarySearchTree<int>::search_recursive(tree->get_root(), 9)->value_, 9);
   EXPECT_TRUE(tree->delete_node(tree->get_root(), 9));
-  EXPECT_EQ(BinarySearchTree<int>::search_recursive(tree->get_root(), 9), nullptr);
+  EXPECT_EQ(BinarySearchTree<int>::search_recursive(tree->get_root(), 9),
+            nullptr);
 }
 
 TEST_F(BinarySearchTreeShould, DeleteNodeWith2ChildrenWithDuplicate) {
@@ -63,11 +102,14 @@ TEST_F(BinarySearchTreeShould, DeleteNodeWith2ChildrenWithDuplicate) {
   tree->insert_node(10);
   tree->insert_node(14);
 
-  EXPECT_EQ(BinarySearchTree<int>::search_recursive(tree->get_root(), 4)->value_, 4);
+  EXPECT_EQ(
+      BinarySearchTree<int>::search_recursive(tree->get_root(), 4)->value_, 4);
   EXPECT_TRUE(tree->delete_node(tree->get_root(), 4));
-  EXPECT_EQ(BinarySearchTree<int>::search_recursive(tree->get_root(), 4)->value_, 4);
+  EXPECT_EQ(
+      BinarySearchTree<int>::search_recursive(tree->get_root(), 4)->value_, 4);
   EXPECT_TRUE(tree->delete_node(tree->get_root(), 4));
-  EXPECT_EQ(BinarySearchTree<int>::search_recursive(tree->get_root(), 4), nullptr);
+  EXPECT_EQ(BinarySearchTree<int>::search_recursive(tree->get_root(), 4),
+            nullptr);
 }
 
 TEST_F(BinarySearchTreeShould, FlattenInOrder) {
