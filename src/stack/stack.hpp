@@ -20,11 +20,11 @@ class Stack final {
     return num_of_elements_ == 0 ? -1 : stack_array_[num_of_elements_ - 1];
   }
 
-  [[nodiscard]] consteval auto size() const noexcept -> size_t {
+  [[nodiscard]] constexpr auto size() const noexcept -> decltype(Size) {
     return num_of_elements_;
   }
 
-  [[nodiscard]] constexpr auto push(int value) noexcept -> bool {
+  [[nodiscard]] constexpr auto push(T value) noexcept -> bool {
     if (num_of_elements_ < capacity_) {
       stack_array_[num_of_elements_] = value;
       num_of_elements_++;
@@ -42,6 +42,10 @@ class Stack final {
 
     std::cerr << "Stack is empty!\n";
     return -1;
+  }
+
+  [[nodiscard]] constexpr auto capacity() const noexcept -> decltype(Size) {
+    return capacity_;
   }
 
  private:

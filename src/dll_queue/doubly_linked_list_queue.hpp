@@ -1,0 +1,10 @@
+#ifndef DATA_STRUCTURES_DOUBLY_LINKED_LIST_QUEUE_HPP
+#define DATA_STRUCTURES_DOUBLY_LINKED_LIST_QUEUE_HPP
+
+#include "doubly_linkedlist.hpp"
+
+class DoublyLinkedListQueue {
+
+};
+
+#endif  // DATA_STRUCTURES_DOUBLY_LINKED_LIST_QUEUE_HPP

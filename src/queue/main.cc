@@ -44,6 +44,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
   std::cout << "Dequeue: " << queue.dequeue() << "\n";
   std::cout << "Front: " << queue.front() << "\n";
   std::cout << "Back: " << queue.back() << "\n";
+  std::cout << "Size: " << queue.size() << "\n";
+  std::cout << "Dequeue: " << queue.dequeue() << "\n";
+  std::cout << "Dequeue: " << queue.dequeue() << "\n";
+  std::cout << "Size: " << queue.size() << "\n";
 
   return 0;
 }

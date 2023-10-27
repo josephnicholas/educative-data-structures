@@ -18,6 +18,7 @@ find_package(benchmark REQUIRED)
 
 #set_project_warnings(${PROJECT_NAME})
 
+add_subdirectory(src/dll_queue)
 add_subdirectory(src/graph)
 add_subdirectory(src/trie)
 add_subdirectory(src/stack)

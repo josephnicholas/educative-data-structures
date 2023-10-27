@@ -14,9 +14,9 @@ class Queue final {
   // front - returns first element of the queue
   // empty - checks is queue is empty
  public:
-  constexpr Queue() noexcept
-      : queue_array_{std::array<T, Size>{}},
-        capacity_{Size} {}
+  constexpr Queue() noexcept : capacity_{Size} {
+    queue_array_.reserve(Size);
+  }
 
   [[nodiscard]] constexpr auto empty() const noexcept -> bool {
     return num_of_elements_ == 0;
@@ -35,11 +35,11 @@ class Queue final {
       return -1;
     }
 
-    return queue_array_.at(back_ - 1);
+    return queue_array_.at(queue_array_.size() - 1);
   }
 
-  [[nodiscard]] consteval auto size() const noexcept -> size_t {
-    return Size;
+  [[nodiscard]] constexpr auto size() const noexcept -> size_t {
+    return queue_array_.size();
   }
 
   [[maybe_unused]] inline void enqueue(T value) {
@@ -48,13 +48,7 @@ class Queue final {
       return;
     }
 
-    if (back_ > capacity_) {
-      // if back reaches end of array
-      // reset back
-      back_ = SIZE_MAX;
-    }
-
-    queue_array_.at(back_++) = value;
+    queue_array_.push_back(value);
     num_of_elements_++;
   }
 
@@ -64,20 +58,14 @@ class Queue final {
       return -1;
     }
 
-    const auto value = queue_array_.at(front_++);
+    const auto value = queue_array_.at(front_);
+    queue_array_.erase(queue_array_.begin() + front_);
 
-    if (front_ == capacity_) {
-      // if front reaches end of queue
-      // reset front
-      front_ = 0;
-    }
-
-    num_of_elements_--;
     return value;
   }
 
  private:
-  std::array<T, Size> queue_array_{};
+  std::vector<T> queue_array_{};
   size_t capacity_{};
   size_t num_of_elements_{};
   size_t front_{};

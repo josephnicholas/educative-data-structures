@@ -6,7 +6,7 @@
 
 static void BM_ConstructTrie(benchmark::State& state) {
     auto trie = std::make_unique<Trie>();
-    for (auto _ : state) {
+    for ([[maybe_unused]] auto stt : state) {
         trie->construct_trie(std::vector<std::string>{
                 "the", "a", "there", "answer", "any", "by", "bye", "their", "abc"});
     }
@@ -18,7 +18,7 @@ static void BM_SearchByPrefix(benchmark::State& state) {
     trie->construct_trie(std::vector<std::string>{
             "the", "a", "there", "answer", "any", "by", "bye", "their", "abc"});
 
-    for (auto _ : state) {
+    for ([[maybe_unused]] auto stt : state) {
         std::ignore = trie->search_by_prefix("th");
     }
 }

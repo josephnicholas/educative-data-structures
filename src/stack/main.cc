@@ -11,5 +11,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
   std::cout << "Pop top of stack: " << stk.pop() << "\n";
   std::cout << "Pop top of stack: " << stk.pop() << "\n";
   std::cout << "Top of stack: " << stk.top() << "\n";
+  std::cout << "Capacity of stack: " << stk.capacity() << "\n";
+  std::cout << "Size of stack: " << stk.size() << "\n";
   return 0;
 }

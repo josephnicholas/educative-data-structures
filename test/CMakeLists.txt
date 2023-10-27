@@ -47,4 +47,8 @@ target_link_libraries(bst-test
         PUBLIC ${GTest_LIBRARIES}
         ${GTest_SYSTEM_LIBRARIES})
 
-gtest_discover_tests(doubly-linkedlist-test linkedlist-test graph-test bst-test)
+# Discover all tests by target
+gtest_discover_tests(linkedlist-test)
+gtest_discover_tests(bst-test)
+gtest_discover_tests(doubly-linkedlist-test)
+gtest_discover_tests(graph-test)
